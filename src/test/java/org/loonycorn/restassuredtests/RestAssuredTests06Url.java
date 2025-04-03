@@ -68,35 +68,87 @@ public class RestAssuredTests06Url {
     }
 
 
-    private static final String CATEGORY_JEWELLERY_PATH = "/products/category/jewelery";
-    private static final String CATEGORY_ELECTRONICS_PATH = "/products/category/electronics";
+    private static final String COMPONENT_CATEGORY_URL = "https://fakestoreapi.com/{component}/{categories}/{category}";
 
     @Test
-    public void testCategories() {
-        RestAssured.get(COMPONENT_ID_URL + CATEGORY_JEWELLERY_PATH)
+    public void testCategoriesWithPathParams() {
+        RestAssured
+                .given()
+                    .pathParams("component", "products")
+                    .pathParams("categories", "category")
+                    .pathParams("category", "jewelery")
+                .when()
+                    .get(COMPONENT_CATEGORY_URL)
                 .then()
-                .statusCode(200);
+                    .statusCode(200);
 
-        RestAssured.get(COMPONENT_ID_URL + CATEGORY_ELECTRONICS_PATH)
+        RestAssured
+                .given()
+                    .pathParams("component", "products")
+                    .pathParams("categories", "category")
+                    .pathParams("category", "electronics")
+                .when()
+                    .get(COMPONENT_CATEGORY_URL)
                 .then()
-                .statusCode(200);
+                    .statusCode(200);
 
     }
 
-    private static final String USER_ONE_LIMIT_FIVE_CART_PARAMS = "/carts?userId=1&limit=5";
-    private static final String USER_ONE_LIMIT_TWO_CART_PARAMS = "/carts?userId=1&limit=2";
+    private static final String CART_USER_LIMIT_URL = "https://fakestoreapi.com/{component}?{user}&{limit}";
 
     @Test
     public void testCartUserAndLimit() {
-        RestAssured.get(COMPONENT_ID_URL + USER_ONE_LIMIT_FIVE_CART_PARAMS)
+        RestAssured
+                .given()
+                    .pathParams("component", "carts")
+                    .pathParams("user", "userId=1")
+                    .pathParams("limit", "limit=5")
+                .when()
+                    .get(CART_USER_LIMIT_URL)
                 .then()
-                .statusCode(200)
-                .body("size()", is(5));
+                    .statusCode(200)
+                    .body("size()", is(5));
 
-        RestAssured.get(COMPONENT_ID_URL + USER_ONE_LIMIT_TWO_CART_PARAMS)
+        RestAssured
+                .given()
+                .pathParams("component", "carts")
+                .pathParams("user", "userId=2")
+                .pathParams("limit", "limit=3")
+                .when()
+                    .get(CART_USER_LIMIT_URL)
                 .then()
-                .statusCode(200)
-                .body("size()", is(2));
+                    .statusCode(200)
+                    .body("size()", is(3));
+
+    }
+
+    // Comment spécifier les paramètres de requête dans RestAssured avec "QueryParam"
+    private static final String STORE_CART_URL = "https://fakestoreapi.com/carts";
+
+    @Test
+    public void testComponentsWithPathParams() {
+        // les fonctionnalités des méthodes .queryParam() et .param() sont identiques
+        RestAssured
+                .given()
+                    .queryParam("userId", 1) // QueryParam pour avoir "?userId=1"
+                    .queryParam("limit", 5) // QueryParam supplémentaire pour avoir "&limit=5"
+                .when()
+                    .get(STORE_CART_URL) // les QueryParam seront ajoutés à l'URL .get()
+                    .prettyPeek() // On jète un oeil à la réponse qui nous est renvoyée
+                .then()
+                    .statusCode(200)
+                    .body("size()", equalTo(5));
+
+        RestAssured
+                .given()
+                    .param("userId", 2) // QueryParam pour avoir "?userId=2"
+                    .param("limit", 2) // QueryParam supplémentaire pour avoir "&limit=2"
+                .when()
+                    .get(STORE_CART_URL) // les QueryParam seront ajoutés à l'URL .get()
+                    .peek()
+                .then()
+                    .statusCode(200)
+                    .body("size()", equalTo(2));
 
     }
 
