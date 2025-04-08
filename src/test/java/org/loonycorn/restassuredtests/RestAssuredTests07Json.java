@@ -3,7 +3,6 @@ package org.loonycorn.restassuredtests;
 import io.restassured.RestAssured;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.ResponseBody;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Map;
@@ -75,13 +74,14 @@ public class RestAssuredTests07Json {
     }
 
     @Test
-    public void testBody() {
+    public void testBody1() {
         ResponseBody<?> responseBody = RestAssured
                 .given()
                     .pathParam("id", 1)
                 .when()
                     .get(STORE_USER_URL);
 
+        // Nous accédons à l'Objet jsonPath() depuis responseBody, puis nous utilisons la méthode get() pour accéder aux différentes parties du responseBody
         JsonPath jsonPath = responseBody.jsonPath();
 
         // Propriétés de 1er niveau
@@ -96,6 +96,56 @@ public class RestAssuredTests07Json {
         assertThat(jsonPath.get("address.city"), equalTo("kilcoole"));
         assertThat(jsonPath.get("address.street"), equalTo("new road"));
         assertThat(jsonPath.get("address.number"), equalTo(7682));
+    }
+
+    // REST Assured API Testing: Validating JSON Responses & Schemas
+    //Validating JSON Response with Nested Structures
+
+    @Test
+    public void testBody2() {
+        // Maintenant je n'ai aucune instruction assertThat() dans mon code
+        // je n'ai que l'interface fluide RestAssured pour valider le corps de la réponse sans accéder à l'objet jsonPath
+        RestAssured
+                .given()
+                    .pathParam("id", 1)
+                .when()
+                    .get(STORE_USER_URL)
+                .then() // j'utilise la méthode then() pour obtenir un réponse valide
+                    .body("id", equalTo(1)) // j'invoque simplement la méthode body() pour vérifier le corps de la réponse
+                    .body("email", equalTo("john@gmail.com"))
+                    .body("address.city", equalTo("kilcoole"))
+                    .body("address.number", equalTo(7682))
+                    .body("name.firstname", equalTo("john"))
+                    .body("name.lastname", equalTo("doe"))
+                    .body (containsStringIgnoringCase("zipcode"))
+                    .body(allOf(containsString("name"), containsString("address")));
+
+    }
+
+    @Test
+    public void testBody3() {
+        // RootPath() permet de préciser le chemin JSON des données imbriquées
+        RestAssured
+                .given()
+                    .pathParam("id", 1)
+                .when()
+                    .get(STORE_USER_URL)
+                    .prettyPeek()
+                .then()
+                .rootPath("address") // le rootPath() permet de préciser le chemin JSON des données imbriquées
+                    .body("city", equalTo("kilcoole"))
+                    .body("number", equalTo(7682))
+                .rootPath("address.geolocation") // le rootPath() permet de préciser le chemin des données imbriquées
+                    .body("lat", equalTo("-37.3159"))
+                    .body("long", equalTo("81.1496"))
+                .rootPath("name") // il faut le préciser à chaque fois car il s'applique à tous les invocations .body() qui suivent
+                    .body("firstname", equalTo("john"))
+                    .body("lastname", equalTo("doe"))
+                .noRootPath() // il faut désactiver le rootPath() pour les données de 1er niveau
+                    .body("id", equalTo(1))
+                    .body("email", equalTo("john@gmail.com"))
+                    .body("phone", equalTo("1-570-236-7033"));
+
 
     }
 
