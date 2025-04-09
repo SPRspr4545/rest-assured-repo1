@@ -149,4 +149,7 @@ public class RestAssuredTests07Json {
 
     }
 
+    // Validating Collections in the JSON Response
+
+
 }
