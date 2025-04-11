@@ -53,7 +53,7 @@ public class RestAssuredTests11XML {
     // qu'en est-il des tableaux avec la balise de 1er niveau <objects type="array">
 
     @Test
-    public void testXMLResponse2() {
+    public void testXMLResponse3() {
         RestAssured
                 .given()
                     .accept(ContentType.XML)
@@ -68,7 +68,7 @@ public class RestAssuredTests11XML {
     }
 
     @Test
-    public void testXMLResponse3() {
+    public void testXMLResponse4() {
         // on peut utiliser .rootPath() pour spécifier les balises XML de 1er niveau et ainsi éviter les répétitions
         RestAssured
                 .given()
@@ -90,7 +90,7 @@ public class RestAssuredTests11XML {
     }
 
     @Test
-    public void testXMLResponse4() {
+    public void testXMLResponse5() {
         // on peut accéder à tous les éléments de la même balise XML
         RestAssured
                 .given()
