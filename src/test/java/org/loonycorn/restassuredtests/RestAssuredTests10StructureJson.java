@@ -11,7 +11,7 @@ public class RestAssuredTests10StructureJson {
         // Generating JSON Schema for Validation
         // Validating JSON Schema
 
-    private static final String TODOS_URL = "https://jsonplaceholder.typicode.com/todos/{id}";
+    private static final String TODO_URL = "https://jsonplaceholder.typicode.com/todos/{id}";
 
     @Test
     public void testSchemaValidation() {
@@ -19,7 +19,7 @@ public class RestAssuredTests10StructureJson {
                 .given()
                     .pathParam("id", 1)
                 .when()
-                    .get(TODOS_URL)
+                    .get(TODO_URL)
                 .then() // quand la réponse est disponible:
                     .body(matchesJsonSchemaInClasspath("todo_schema.json")); // vérifie si le body correspond au schéma spécifié
             // "todo_schema.json" se trouve directement sous "resources", je n'ai pas besoin de spécifier le chemin absolue (complet)
@@ -43,5 +43,19 @@ public class RestAssuredTests10StructureJson {
                     .body(matchesJsonSchemaInClasspath("user_schema.json"));
 
     }
+
+    private static final String TODOS_URL = "https://jsonplaceholder.typicode.com/todos/";
+
+    @Test
+    public void testSchemaValidation3() {
+        RestAssured
+                .get(TODOS_URL) // renvoi 200 objets
+                .then()
+                    .body(matchesJsonSchemaInClasspath("todos_schema.json"));
+                    // le schema n'en contient qu'un identique pour tous les objets
+
+    }
+
+    // Validating XML Responses
 
 }
