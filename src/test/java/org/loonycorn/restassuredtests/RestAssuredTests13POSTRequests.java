@@ -1,5 +1,7 @@
 package org.loonycorn.restassuredtests;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.testng.annotations.Test;
@@ -96,10 +98,11 @@ public class RestAssuredTests13POSTRequests {
         RestAssured
                 .given()
                     .contentType(ContentType.JSON)
-                    .baseUri(BUGS_URL)
-                    .pathParam("bug_id", bugId)
+                    .baseUri(BUGS_URL) // je spécifie l'URL de base dans la méthode .baseUri() plutôt que dans la méthode GET ou POST
+                    .pathParam("bug_id", bugId) // puis je précise un pathParam()
+                    // cependant le baseUri() ne contient pas d'espace réservé pour le pathParam()
                 .when()
-                    .get("/{bug_id}") // requête GET au BUGS_URL renvoie une liste de bugs et dans cette liste...
+                    .get("/{bug_id}") // le "bug_id" pathParam() est spécifié dans la requête GET
                 .then()
                     .statusCode(200)
                     .body("createdBy", equalTo("Kim Doe"))
@@ -109,6 +112,72 @@ public class RestAssuredTests13POSTRequests {
                     .body("completed", equalTo(false));
     }
 
-}
+    // pour quoi ne pas utiliser un "mappeur" d'objets JSON pour créer un objet bug "bugBodyJson" ?
+    // nous pouvons utiliser la dépendance <>jackson-databind</> présente dans le pom.xml, pour sérialiser les objets JSON
+
+    @Test
+    public void testPOSTCreateBug3() {
+        // plutôt que de spécifier le JSON  du corps de la requêt sous forme de chaîne sérialisée qui est difficile à lire,
+        // j'utilise un "mappeur d'objets"
+
+        String bugBodyJson = "null"; // la chaîne "bugBodyJson" est initialisée à 0 pour commencer
+
+        // j'instancie un ObjectMapper() "jackson-databind"
+        ObjectMapper objectMapper = new ObjectMapper(); // c'est la classe qui permet de créer du JSON et de le sérialiser ou d'analyser du JSON
+        ObjectNode bug  = objectMapper.createObjectNode(); // à l'aide de l'ObjectMapper je crée un noeud JSON
+        // c'est l'objet JSON qui représentera notre bug
+
+        // je précise les champs de mon objet de bug
+        bug.put("createdBy", "Joseph Wang 2");
+        bug.put("priority", 3);
+        bug.put("severity", "Higth");
+        bug.put("title", "Cannot filter by category 2");
+        bug.put("completed", false);
+
+        // ne pas oublier que le body de notre requête doit être spécifié au format JSON sérialisé sous forme de chaîne sérialisée
+        try {
+            // j'appel objectMapper.writeValueAsString() et je lui transmets cet objet de bug...
+            bugBodyJson = objectMapper.writeValueAsString(bug); // ...qui sérialisera ce bug sous forme de chaîne String
+            // cette méthode est bien plus simple que d'utiliser des chaînes JSON brutes
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String bugId = RestAssured // je crée la variable "bugId" pour récupérer et stocker la/les propriétés de mon choix
+                .given()
+                    .contentType(ContentType.JSON)
+                    .body(bugBodyJson) // cette chaine "bugBodyJson" est transmise en tant que corps de la requête
+                .when()
+                    .post(BUGS_URL) // requête POST à l'adresse BUGS_URL
+                .then()
+                    .statusCode(201)
+                    .body("createdBy", equalTo("Joseph Wang 2"), // vérifie que le corps de la réponse possède les propriétés que j'ai précédement créé
+                            "priority", equalTo(3),
+                            "severity", equalTo("Higth"),
+                            "title", equalTo("Cannot filter by category 2"),
+                            "completed", equalTo(false)
+                    )
+                    .extract().path("bugId"); // .extract() méthode me permet d'accéder aux champs de ma réponse
+                    // .path() méthode me permet d'extraire le champs ID que je stocke dans la variable "bugId"
+
+        System.out.println("Bug ID: " + bugId);
+
+        // ensuite je passe un autre appel RestAssured pour vérifier le bug avec l'ID que je possède
+        RestAssured
+                .given()
+                    .contentType(ContentType.JSON)
+                    .baseUri(BUGS_URL) // je spécifie l'URL de base dans la méthode .baseUri() plutôt que dans la méthode GET ou POST
+                    .pathParam("bug_id", bugId) // puis je précise un pathParam()
+                    // cependant le baseUri() ne contient pas d'espace réservé pour le pathParam()
+                .when()
+                    .get("/{bug_id}") // le "bug_id" pathParam() est spécifié dans la requête GET
+                .then()
+                    .statusCode(200)
+                    .body("createdBy", equalTo(bug.get("createdBy").asText()))
+                    .body("priority", equalTo(bug.get("priority").asInt()))
+                    .body("severity", equalTo(bug.get("severity").asText()))
+                    .body("title", equalToIgnoringCase(bug.get("title").asText()))
+                    .body("completed", equalTo(bug.get("completed").asBoolean()));
+    }
 
 }
