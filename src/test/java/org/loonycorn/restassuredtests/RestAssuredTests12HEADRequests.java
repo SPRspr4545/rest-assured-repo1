@@ -5,10 +5,10 @@ import org.testng.annotations.Test;
 
 import static org.hamcrest.Matchers.*;
 
-public class RestAssuredTests12HeadRequests {
+public class RestAssuredTests12HEADRequests {
 
     //REST Assured API Testing: Testing Different Types of HTTP Endpoints
-    // Making HEAD and OPTIONS Requests
+        // Making HEAD and OPTIONS Requests
 
     private static final String URL = "https://httpbin.org";
 

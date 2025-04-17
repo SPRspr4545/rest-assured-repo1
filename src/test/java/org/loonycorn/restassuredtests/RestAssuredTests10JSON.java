@@ -5,7 +5,7 @@ import org.testng.annotations.Test;
 
 import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 
-public class RestAssuredTests10StructureJson {
+public class RestAssuredTests10JSON {
 
     // REST Assured API Testing: Validating JSON Responses & Schemas
         // Generating JSON Schema for Validation
