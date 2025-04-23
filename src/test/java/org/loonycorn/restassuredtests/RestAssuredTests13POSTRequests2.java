@@ -211,4 +211,29 @@ public class RestAssuredTests13POSTRequests2 {
                 );
     }
 
+    @Test(dependsOnMethods = {"testPATCHUpdateBugTwo"})
+    public void testDELETERemoveBugOne() {
+
+        String bugIdOne = RestAssured
+                .given()
+                    .contentType(ContentType.JSON)
+                .when()
+                    .get(BUGS_URL)
+                    .prettyPeek()
+                .then()
+                    .statusCode(200)
+                    .extract().path("bugId[0]");
+
+        RestAssured
+                .given()
+                    .contentType(ContentType.JSON)
+                    .baseUri(BUGS_URL)
+                    .pathParam("bug_id", bugIdOne)
+                .when()
+                    .delete("/{bug_id}")
+                .then()
+                    .statusCode(200)
+                    .body("bug_id", equalTo(bugIdOne));
+    }
+
 }
