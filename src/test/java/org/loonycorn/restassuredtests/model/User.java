@@ -1,16 +1,25 @@
 package org.loonycorn.restassuredtests.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 // indiquer au désérialiseur JSON qu'il faut ignorer les autres propriétés du flux
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
     private int id;
-    private String email;
     private String username;
-    private String phone;
 
-    // pour générer automatiquement les Getters et les Setters :
+    // pour que les variables membres de la classe Java aient leur propre convention de dénomination, qui soit différente de celle de la réponse JSON
+    // en utilisant l'annotation @JsonProperty() pour spécifier le mappage avec le champ que représente cette variable membre
+    // @JsonProperty("email") indiquera au désérialiseur que la valeur du champ "email" dans la réponse JSON est mappé à la variable membre "emailAddress"
+    // ce mappage permet à la variable membre de porter un nom différent du champ
+    @JsonProperty("email")
+    private String emailAddress;
+    // idem
+    @JsonProperty("phone")
+    private String phoneNumber;
+
+    // une fois les variables déclarées, pour générer automatiquement les Getters et les Setters :
         // clic droit : Generate
         // [Getter & Setter]
 
@@ -23,12 +32,12 @@ public class User {
         this.id = id;
     }
 
-    public String getEmail() {
-        return email;
+    public String getEmailAddress() {
+        return emailAddress;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmailAddress(String emailAddress) {
+        this.emailAddress = emailAddress;
     }
 
     public String getUsername() {
@@ -39,11 +48,11 @@ public class User {
         this.username = username;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

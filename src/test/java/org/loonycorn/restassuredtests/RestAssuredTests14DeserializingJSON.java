@@ -51,7 +51,7 @@ public class RestAssuredTests14DeserializingJSON {
         // maintenant, plutôt que de valider le body en spécifiant le chemin JSON pour spécifier les différents champs
         // RestAssured permet de désérialiser la réponse à un type générique, utilisable pour valider
         // un objet JSON peut être désérialisé sur une MAP<>
-        // si la réponse était une lIST<> d'objets JSON on ferait la désérialisation avec un type de LIST<> générique
+        // si la réponse était une lIST<> d'objets JSON, on ferait la désérialisation avec un type de LIST<> générique
         Map<String, Object> user = RestAssured // je stocke la réponse sous forme de MAP
                 .given()
                     .pathParam("id", 3)
@@ -61,7 +61,7 @@ public class RestAssuredTests14DeserializingJSON {
                     // je spécifie "new TypeRef<>() {}" pour effectuer cette désérialisation
 
         // je peux utiliser la MAP en utilisant la méthode "user.get()" pour accéder à des propriétés spécifiques
-        assertThat((Integer) user.get("id"), equalTo(3)); // je converti "id" en entier pour effectuer une comparaîson d'entiers
+        assertThat((Integer) user.get("id"), equalTo(3)); // je convertis "id" en entier pour effectuer une comparaîson d'entiers
         assertThat(user.get("email"), equalTo("kevin@gmail.com"));
         assertThat(user.get("username"), equalTo("kevinryan"));
         assertThat(user.get("phone"), equalTo("1-567-094-1345"));
@@ -96,13 +96,33 @@ public class RestAssuredTests14DeserializingJSON {
         User user = objectMapper.readValue(response.asString(), User.class);
 
         assertThat(user.getId(), equalTo(3));
-        assertThat(user.getEmail(), equalTo("kevin@gmail.com"));
+        assertThat(user.getEmailAddress(), equalTo("kevin@gmail.com"));
         assertThat(user.getUsername(), equalTo("kevinryan"));
-        assertThat(user.getPhone(), equalTo("1-567-094-1345"));
+        assertThat(user.getPhoneNumber(), equalTo("1-567-094-1345"));
 
     }
 
     // REST Assured API Testing: Testing Different Types of HTTP Endpoints
-        //Deserializing Nested Objects
+        // Deserializing Nested Objects
+
+    @Test
+    public void testBody4() {
+        // il existe une meilleur façon de procéder lorsqu'on utilise REST Assured
+        // on se débarasse complètement du "ObjectMapper"
+        // au lieu de cela j'adresse une requête .get() au "STORE_USER_URL" ...
+        // ...pour obtenir une réponse que je désérialise à un objet "User.class" en utilisant la méthode .as()
+        User user = RestAssured
+                .given()
+                    .pathParam("id", 3)
+                .when()
+                    .get(STORE_USER_URL).as(User.class); // la méthode .as() va effectuer la désérialisation...
+                    // ...et on obtient un objet "User" que je stocke dans la variable "user"
+
+        assertThat(user.getId(), equalTo(3));
+        assertThat(user.getEmailAddress(), equalTo("kevin@gmail.com"));
+        assertThat(user.getUsername(), equalTo("kevinryan"));
+        assertThat(user.getPhoneNumber(), equalTo("1-567-094-1345"));
+
+    }
 
 }
