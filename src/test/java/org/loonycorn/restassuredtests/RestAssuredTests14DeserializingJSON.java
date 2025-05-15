@@ -123,6 +123,11 @@ public class RestAssuredTests14DeserializingJSON {
         assertThat(user.getUsername(), equalTo("kevinryan"));
         assertThat(user.getPhoneNumber(), equalTo("1-567-094-1345"));
 
+        assertThat(user.getAddress().getCity(), equalTo("Cullman"));
+        assertThat(user.getAddress().getStreet(), equalTo("Frances Ct"));
+        assertThat(user.getAddress().getNumber(), equalTo(86));
+        assertThat(user.getAddress().getZipcode(), equalTo("29567-1452"));
+
     }
 
 }
