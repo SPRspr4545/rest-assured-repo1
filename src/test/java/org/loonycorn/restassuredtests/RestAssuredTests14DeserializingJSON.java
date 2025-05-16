@@ -130,4 +130,44 @@ public class RestAssuredTests14DeserializingJSON {
 
     }
 
+    // REST Assured API Testing: Testing Different Types of HTTP Endpoints
+        // Eliminating Boilerplate Code Using Lombok
+        // Lombok est une bibliothèque Java utilisée pour simplifier le code Java
+        // principalement utilisé pour réduire le code standard pour les objets de données des modèles
+        // il peut générer automatiquement des Getters, des Setters, des méthodes toString equals et des implémentations HashCode
+        // et bien d'autres choses encore en utilisant simplement des annotations sur la Classe
+    // Dans Paramêtre, le plugin Lombok est installé pour éviter que tous les "user.getXxxxx()" ne soient souligné en rouge
+    // Lorsqu'on travail sur un projet comportant de nombreuses entitées de modèles, Lombok génère automatiquement un tas de code standard automatiquement
+        // Voir les objets "Address.java" et "User.java" : les getters et les setters sont commentés
+
+
+    // jusqu'à présent nous avons désérialisé et analysé une réponse JSON
+    // mais que se passe-t-il si l'API renvoie une liste d'objets ou une collection d'objets ?
+    private static final String STORE_USERS_URL = "https://fakestoreapi.com/users/";
+
+    @Test
+    public void testBody5() {
+        // c'est extrêmement simple, il suffit de préciser que la réponse contient une "List<User>"
+        // je diffuse la réponse sous forme d'un tableau d'objets utilisateur lorsque je spécifie la Classe "User[]"
+        // Ensuite, la méthode "Arrays.asList()" convertira ce tableau en "List<User>"
+        List<User> users = Arrays.asList(RestAssured
+                .get(STORE_USERS_URL).as(User[].class));
+
+        assertThat(users.size(), equalTo(10));
+
+        assertThat(users.get(2).getId(), equalTo(3));
+        assertThat(users.get(2).getEmailAddress(), equalTo("kevin@gmail.com"));
+        assertThat(users.get(2).getUsername(), equalTo("kevinryan"));
+        assertThat(users.get(2).getPhoneNumber(), equalTo("1-567-094-1345"));
+
+        assertThat(users.get(2).getAddress().getCity(), equalTo("Cullman"));
+        assertThat(users.get(2).getAddress().getStreet(), equalTo("Frances Ct"));
+        assertThat(users.get(2).getAddress().getNumber(), equalTo(86));
+        assertThat(users.get(2).getAddress().getZipcode(), equalTo("29567-1452"));
+
+        assertThat(users.get(2).getFirstname(), equalTo("kevin"));
+        assertThat(users.get(2).getLastname(), equalTo("ryan"));
+
+    }
+
 }
